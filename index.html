@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golf Tee Times - Burnaby & Vancouver Courses</title>
+    <title>Tee Sheets - Burnaby & Vancouver Courses</title>
     <style>
         * {
             margin: 0;
@@ -44,6 +44,41 @@
             font-size: 1.1rem;
         }
 
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #2c5530;
+            background: white;
+            border-bottom-color: #4a7c59;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
         .controls {
             background: #f8f9fa;
             padding: 25px;
@@ -52,6 +87,15 @@
             gap: 20px;
             align-items: center;
             flex-wrap: wrap;
+        }
+
+        .monitor-controls {
+            background: #f8f9fa;
+            padding: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            align-items: end;
         }
 
         .control-group {
@@ -79,7 +123,7 @@
             border-color: #4a7c59;
         }
 
-        .search-btn {
+        .search-btn, .monitor-btn {
             background: #4a7c59;
             color: white;
             border: none;
@@ -92,12 +136,23 @@
             transition: all 0.3s ease;
         }
 
-        .search-btn:hover {
+        .monitor-btn {
+            background: #4a7c59;
+            grid-column: 1 / -1;
+            justify-self: center;
+            max-width: 300px;
+        }
+
+        .search-btn:hover, .monitor-btn:hover {
             background: #2c5530;
             transform: translateY(-2px);
         }
 
-        .search-btn:disabled {
+        .monitor-btn:hover {
+            background: #c82333;
+        }
+
+        .search-btn:disabled, .monitor-btn:disabled {
             background: #ccc;
             cursor: not-allowed;
             transform: none;
@@ -105,6 +160,77 @@
 
         .content {
             padding: 30px;
+        }
+
+        .monitor-info {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f0f8ff 100%);
+            border: 1px solid #2196f3;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .monitor-info h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .monitor-info p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .success-message {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid rgba(40, 167, 69, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            color: #155724;
+            margin-bottom: 20px;
+        }
+
+        .success-message h3 {
+            margin-bottom: 10px;
+            color: #28a745;
+        }
+
+        .existing-request-message {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            color: #856404;
+            margin-bottom: 20px;
+        }
+
+        .existing-request-message h3 {
+            margin-bottom: 10px;
+            color: #ff6b35;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .existing-request-details {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: left;
+        }
+
+        .existing-request-details h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .existing-request-details p {
+            margin: 5px 0;
+            color: #6c5700;
         }
 
         .stats {
@@ -326,16 +452,24 @@
                 font-size: 1.8rem;
             }
             
+            .tabs {
+                flex-direction: column;
+            }
+            
             .controls {
                 flex-direction: column;
                 align-items: stretch;
+            }
+            
+            .monitor-controls {
+                grid-template-columns: 1fr;
             }
             
             .control-group input, .control-group select {
                 min-width: 100%;
             }
             
-            .search-btn {
+            .search-btn, .monitor-btn {
                 align-self: stretch;
             }
             
@@ -357,74 +491,155 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🏌️ Tee Time Radar</h1>
-            <p>Available Bookings - Burnaby & Vancouver Golf Courses</p>
+            <h1>🏌️ Tee Sheets</h1>
+            <p>Available Bookings & Notifications - Burnaby & Vancouver Golf Courses</p>
         </div>
 
-        <div class="controls">
-            <div class="control-group">
-                <label for="searchDate">Date</label>
-                <input type="date" id="searchDate" name="searchDate">
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('search')">
+                🔍 Search Tee Times
             </div>
-            
-            <div class="control-group">
-                <label for="courseFilter">Course</label>
-                <select id="courseFilter" name="courseFilter">
-                    <option value="all">All Courses</option>
-                    <option value="burnaby">Burnaby Only</option>
-                    <option value="vancouver">Vancouver Only</option>
-                </select>
+            <div class="tab" onclick="switchTab('monitor')">
+                🔔 Notifications
             </div>
-            
-            <div class="control-group">
-                <label for="timeFilter">Time</label>
-                <select id="timeFilter" name="timeFilter">
-                    <option value="">Any Time</option>
-                    <option value="morning">Morning (6 AM - 12 PM)</option>
-                    <option value="afternoon">Afternoon (12 PM - 6 PM)</option>
-                    <option value="evening">Evening (6 PM+)</option>
-                </select>
-            </div>
-            
-            <div class="control-group">
-                <label for="maxPrice">Max Price ($)</label>
-                <input type="number" id="maxPrice" name="maxPrice" placeholder="100.00" step="0.01">
-            </div>
-            
-            <button class="search-btn" onclick="fetchTeeTimesData()">🔍 Search</button>
         </div>
 
-        <div class="content">
-            <div id="statsSection" class="stats" style="display: none;">
-                <div class="stat">
-                    <div class="stat-number" id="totalCount">0</div>
-                    <div class="stat-label">Total Available</div>
+        <!-- Search Tab Content -->
+        <div id="searchTab" class="tab-content active">
+            <div class="controls">
+                <div class="control-group">
+                    <label for="searchDate">Date</label>
+                    <input type="date" id="searchDate" name="searchDate">
                 </div>
-                <div class="stat">
-                    <div class="stat-number" id="courseCount">0</div>
-                    <div class="stat-label">Courses</div>
+                
+                <div class="control-group">
+                    <label for="courseFilter">Course</label>
+                    <select id="courseFilter" name="courseFilter">
+                        <option value="all">All Courses</option>
+                        <option value="burnaby">Burnaby Only</option>
+                        <option value="vancouver">Vancouver Only</option>
+                    </select>
                 </div>
-                <div class="stat">
-                    <div class="stat-number" id="priceRange">$0-$0</div>
-                    <div class="stat-label">Price Range</div>
+                
+                <div class="control-group">
+                    <label for="timeFilter">Time</label>
+                    <select id="timeFilter" name="timeFilter">
+                        <option value="">Any Time</option>
+                        <option value="morning">Morning (6 AM - 12 PM)</option>
+                        <option value="afternoon">Afternoon (12 PM - 6 PM)</option>
+                        <option value="evening">Evening (6 PM+)</option>
+                    </select>
                 </div>
+                
+                <div class="control-group">
+                    <label for="maxPrice">Max Price ($)</label>
+                    <input type="number" id="maxPrice" name="maxPrice" placeholder="100.00" step="0.01">
+                </div>
+                
+                <button class="search-btn" onclick="fetchTeeTimesData()">🔍 Search</button>
             </div>
 
-            <div id="loadingIndicator" class="loading" style="display: none;">
-                <div class="spinner"></div>
-                <p>Fetching available tee times...</p>
-            </div>
+            <div class="content">
+                <div id="statsSection" class="stats" style="display: none;">
+                    <div class="stat">
+                        <div class="stat-number" id="totalCount">0</div>
+                        <div class="stat-label">Total Available</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="courseCount">0</div>
+                        <div class="stat-label">Courses</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="priceRange">$0-$0</div>
+                        <div class="stat-label">Price Range</div>
+                    </div>
+                </div>
 
-            <div class="error-message" id="errorMessage" style="display: none;">
-                <h3>Unable to fetch tee times</h3>
-                <p id="errorText"></p>
-                <button onclick="fetchTeeTimesData()" class="retry-button">Try Again</button>
-            </div>
+                <div id="loadingIndicator" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Fetching available tee times...</p>
+                </div>
 
-            <div id="teeTimesContainer">
-                <div class="no-results">
-                    <h3>🏌️‍♂️ Ready to find tee times?</h3>
-                    <p>Select your preferred date above and click search to see what's available!</p>
+                <div class="error-message" id="errorMessage" style="display: none;">
+                    <h3>Unable to fetch tee times</h3>
+                    <p id="errorText"></p>
+                    <button onclick="fetchTeeTimesData()" class="retry-button">Try Again</button>
+                </div>
+
+                <div id="teeTimesContainer">
+                    <div class="no-results">
+                        <h3>🏌️‍♂️ Ready to find tee times?</h3>
+                        <p>Select your preferred date above and click search to see what's available!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monitor Tab Content -->
+        <div id="monitorTab" class="tab-content">
+            <div class="content">
+                <div class="monitor-info">
+                    <h3>🔔 How Notifications Works</h3>
+                    <p>Set up email notifications for when tee times become available on your preferred dates and times. You'll receive an email alert as soon as matching tee times are found, giving you the best chance to book popular slots!</p>
+                </div>
+
+                <div class="monitor-controls">
+                    <div class="control-group">
+                        <label for="monitorDate">Date to Monitor</label>
+                        <input type="date" id="monitorDate" name="monitorDate">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="monitorTime">Time of Day</label>
+                        <select id="monitorTime" name="monitorTime">
+                            <option value="all">All Times</option>
+                            <option value="morning">Morning (6 AM - 12 PM)</option>
+                            <option value="afternoon">Afternoon (12 PM - 6 PM)</option>
+                            <option value="evening">Evening (6 PM+)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="monitorCity">City</label>
+                        <select id="monitorCity" name="monitorCity">
+                            <option value="all">All Cities</option>
+                            <option value="burnaby">Burnaby</option>
+                            <option value="vancouver">Vancouver</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="monitorEmail">Email Address</label>
+                        <input type="email" id="monitorEmail" name="monitorEmail" placeholder="your@email.com" required>
+                    </div>
+                    
+                    <button class="monitor-btn" onclick="setupMonitoring()">
+                        🔔 Set Up Notifications
+                    </button>
+                </div>
+
+                <div id="monitorLoadingIndicator" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Setting up monitoring...</p>
+                </div>
+
+                <div class="error-message" id="monitorErrorMessage" style="display: none;">
+                    <h3>Unable to set up monitoring</h3>
+                    <p id="monitorErrorText"></p>
+                    <button onclick="setupMonitoring()" class="retry-button">Try Again</button>
+                </div>
+
+                <div class="existing-request-message" id="existingRequestMessage" style="display: none;">
+                    <h3>⚠️ Existing Request Found</h3>
+                    <p id="existingRequestText"></p>
+                    <div class="existing-request-details" id="existingRequestDetails">
+                        <!-- Details will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="success-message" id="monitorSuccessMessage" style="display: none;">
+                    <h3>✅ Monitoring Set Up Successfully!</h3>
+                    <p id="monitorSuccessText" style="white-space: pre-line; text-align: left; max-width: 600px; margin: 0 auto;"></p>
                 </div>
             </div>
         </div>
@@ -432,6 +647,162 @@
 
     <script>
         let currentTeeTimesData = [];
+
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            
+            // Add active class to selected tab
+            event.target.classList.add('active');
+        }
+
+        async function setupMonitoring() {
+            const date = document.getElementById('monitorDate').value;
+            const timeOfDay = document.getElementById('monitorTime').value;
+            const email = document.getElementById('monitorEmail').value;
+            const city = document.getElementById('monitorCity').value;
+
+            // Validate inputs
+            if (!date) {
+                showMonitorError('Please select a date to monitor.');
+                return;
+            }
+            
+            if (!email) {
+                showMonitorError('Please enter your email address.');
+                return;
+            }
+            
+            if (!validateEmail(email)) {
+                showMonitorError('Please enter a valid email address.');
+                return;
+            }
+
+            // Show loading indicator and hide all messages
+            document.getElementById('monitorLoadingIndicator').style.display = 'block';
+            document.getElementById('monitorErrorMessage').style.display = 'none';
+            document.getElementById('monitorSuccessMessage').style.display = 'none';
+            document.getElementById('existingRequestMessage').style.display = 'none';
+
+            try {
+                const response = await fetch('http://localhost:3000/api/monitor-tee-times', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        date: date,
+                        timeOfDay: timeOfDay,
+                        email: email,
+                        city: city
+                    })
+                });
+
+                document.getElementById('monitorLoadingIndicator').style.display = 'none';
+
+                const result = await response.json();
+
+                if (response.status === 409 && result.existingRequest) {
+                    // Handle existing request case
+                    showExistingRequest(result);
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(result.error || result.message || `Server error: ${response.status}`);
+                }
+
+                // Check for success in the response
+                if (result.success) {
+                    // Show success message
+                    document.getElementById('monitorSuccessMessage').style.display = 'block';
+                    const expiryDate = result.expiresAt ? new Date(result.expiresAt).toLocaleDateString() : 'N/A';
+                    document.getElementById('monitorSuccessText').textContent = 
+                        `✅ ${result.message || 'Monitoring set up successfully!'}\n\nDetails:\n• Date: ${formatDate(new Date(date + 'T00:00:00'))}\n• Time: ${timeOfDay === 'all' ? 'All times' : timeOfDay}\n• Location: ${city === 'all' ? 'All cities' : city}\n• Email: ${email}\n• Request ID: ${result.requestId || 'N/A'}\n• Expires: ${expiryDate}`;
+                } else {
+                    throw new Error(result.message || 'Unknown error occurred');
+                }
+                
+                // Clear form
+                document.getElementById('monitorDate').value = '';
+                document.getElementById('monitorTime').value = 'all';
+                document.getElementById('monitorCity').value = 'all';
+                document.getElementById('monitorEmail').value = '';
+
+            } catch (error) {
+                console.error('Error setting up monitoring:', error);
+                let errorMessage = 'Failed to set up monitoring. ';
+                
+                if (error.message.includes('Failed to fetch')) {
+                    errorMessage += 'Please ensure your local API server is running on http://localhost:3000';
+                } else {
+                    errorMessage += error.message;
+                }
+                
+                showMonitorError(errorMessage);
+            }
+        }
+
+        function showExistingRequest(result) {
+            const existingRequest = result.existingRequest;
+            
+            // Show the existing request message
+            document.getElementById('existingRequestMessage').style.display = 'block';
+            document.getElementById('existingRequestText').textContent = result.message || 'You already have an active monitoring request for this date and time period.';
+            
+            // Determine notification status
+            let notificationStatus = '';
+            if (existingRequest.maxNotifications === null) {
+                notificationStatus = `${existingRequest.notificationCount || 0} notifications sent (unlimited)`;
+            } else {
+                notificationStatus = `${existingRequest.notificationCount || 0}/${existingRequest.maxNotifications} notifications sent`;
+            }
+            
+            // Determine monitoring status
+            let monitoringStatus = '';
+            if (existingRequest.notificationCount > 0) {
+                monitoringStatus = `📬 ${existingRequest.notificationCount} notifications sent, still monitoring`;
+            } else {
+                monitoringStatus = '🔔 Actively monitoring (no notifications sent yet)';
+            }
+            
+            // Populate the details with enhanced notification tracking
+            const detailsContainer = document.getElementById('existingRequestDetails');
+            detailsContainer.innerHTML = `
+                <h4>📋 Existing Request Details:</h4>
+                <p><strong>Request ID:</strong> ${existingRequest.id}</p>
+                <p><strong>Date:</strong> ${formatDate(new Date(existingRequest.date + 'T00:00:00'))}</p>
+                <p><strong>Time Period:</strong> ${existingRequest.timeOfDay === 'all' ? 'All times' : existingRequest.timeOfDay}</p>
+                <p><strong>Location:</strong> ${existingRequest.cityText}</p>
+                <p><strong>Email:</strong> ${existingRequest.email}</p>
+                <p><strong>Created:</strong> ${new Date(existingRequest.createdAt).toLocaleDateString()} at ${new Date(existingRequest.createdAt).toLocaleTimeString()}</p>
+                <p><strong>Expires:</strong> ${new Date(existingRequest.expiresAt).toLocaleDateString()}</p>
+                <p><strong>Notifications:</strong> ${notificationStatus}</p>
+                <p><strong>Status:</strong> ${monitoringStatus}</p>
+                ${existingRequest.lastNotifiedAt ? `<p><strong>Last Notified:</strong> ${new Date(existingRequest.lastNotifiedAt).toLocaleDateString()} at ${new Date(existingRequest.lastNotifiedAt).toLocaleTimeString()}</p>` : ''}
+            `;
+        }
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function showMonitorError(message) {
+            document.getElementById('monitorLoadingIndicator').style.display = 'none';
+            document.getElementById('monitorErrorMessage').style.display = 'block';
+            document.getElementById('monitorErrorText').textContent = message;
+        }
 
         function formatTime(dateString) {
             const date = new Date(dateString);
@@ -676,7 +1047,7 @@
             if (prices.length > 0) {
                 const minPrice = Math.min(...prices);
                 const maxPrice = Math.max(...prices);
-                priceRange.textContent = `$${minPrice.toFixed(0)}-$${maxPrice.toFixed(0)}`;
+                priceRange.textContent = `${minPrice.toFixed(0)}-${maxPrice.toFixed(0)}`;
             } else {
                 priceRange.textContent = 'N/A';
             }
@@ -689,7 +1060,7 @@
 
         function createTeeTimeCard(teeTime) {
             const priceInfo = teeTime.shItemPrices && teeTime.shItemPrices[0];
-            const price = priceInfo ? `$${priceInfo.displayPrice.toFixed(2)}` : 'N/A';
+            const price = priceInfo ? `${priceInfo.displayPrice.toFixed(2)}` : 'N/A';
             
             const card = document.createElement('div');
             card.className = 'tee-time-card';
@@ -761,6 +1132,9 @@
             const todayString = today.toISOString().split('T')[0];
             document.getElementById('searchDate').value = todayString;
             document.getElementById('searchDate').min = todayString;
+            
+            // Set minimum date for monitoring (today)
+            document.getElementById('monitorDate').min = todayString;
         });
     </script>
 </body>
