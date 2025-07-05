@@ -717,7 +717,7 @@
             document.getElementById('existingRequestMessage').style.display = 'none';
 
             try {
-                const response = await fetch('http://localhost:3000/api/monitor-tee-times', {
+                const response = await fetch('https://golf-tee-monitor.onrender.com/api/monitor-tee-times', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -766,7 +766,7 @@
                 let errorMessage = 'Failed to set up monitoring. ';
                 
                 if (error.message.includes('Failed to fetch')) {
-                    errorMessage += 'Please ensure your local API server is running on http://localhost:3000';
+                    errorMessage += 'Please ensure your local API server is running on https://golf-tee-monitor.onrender.com';
                 } else {
                     errorMessage += error.message;
                 }
@@ -1104,7 +1104,7 @@
                     </div>
                     <div class="detail price-highlight">
                         <span class="detail-label">Price:</span>
-                        <span class="detail-value">${price}</span>
+                        <span class="detail-value">$${price}</span>
                     </div>
                 </div>
                 
